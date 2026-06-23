@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 800" role="img" aria-labelledby="title desc">
+  <title id="title">Line portrait of Canhui Liu as a chef</title>
+  <desc id="desc">A blue line-art portrait based on a smiling photo, with round glasses, short hair, a chef hat, apron, and flowers.</desc>
+  <rect width="640" height="800" fill="#f8fbff"/>
+  <path d="M72 650C168 610 244 614 319 650C398 688 477 678 568 624" fill="none" stroke="#b9d6f3" stroke-width="10" stroke-linecap="round"/>
+  <path d="M98 592C184 552 261 556 332 590C411 628 487 620 545 580" fill="none" stroke="#dcdcf8" stroke-width="8" stroke-linecap="round"/>
+
+  <path d="M205 300C213 235 255 198 322 198C389 198 431 237 439 301" fill="none" stroke="#123f78" stroke-width="13" stroke-linecap="round"/>
+  <path d="M224 284C250 246 286 228 326 228C369 228 405 250 423 286" fill="none" stroke="#2368b4" stroke-width="7" stroke-linecap="round"/>
+  <path d="M235 321C239 269 271 239 322 238C374 237 408 269 413 321" fill="#ffffff" stroke="#123f78" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M207 328C203 270 226 220 270 199" fill="none" stroke="#123f78" stroke-width="7" stroke-linecap="round"/>
+  <path d="M437 328C443 270 419 220 374 199" fill="none" stroke="#123f78" stroke-width="7" stroke-linecap="round"/>
+
+  <path d="M197 235C168 222 156 195 175 173C193 153 224 158 239 181" fill="#ffffff" stroke="#2368b4" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M239 181C246 145 284 128 315 149C337 111 385 115 401 151C434 134 471 154 470 190C497 194 509 226 486 250C459 278 416 258 408 223C374 245 335 238 318 205C288 234 248 228 239 181Z" fill="#ffffff" stroke="#2368b4" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <path d="M226 331C233 452 268 526 322 526C376 526 411 452 418 331" fill="#ffffff" stroke="#123f78" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M257 357C278 344 304 345 323 359" fill="none" stroke="#123f78" stroke-width="5" stroke-linecap="round"/>
+  <path d="M326 359C346 345 372 344 393 357" fill="none" stroke="#123f78" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="289" cy="382" r="28" fill="none" stroke="#2368b4" stroke-width="5"/>
+  <circle cx="361" cy="382" r="28" fill="none" stroke="#2368b4" stroke-width="5"/>
+  <path d="M317 382C323 378 328 378 334 382" fill="none" stroke="#2368b4" stroke-width="4" stroke-linecap="round"/>
+  <path d="M261 374L232 356" fill="none" stroke="#2368b4" stroke-width="4" stroke-linecap="round"/>
+  <path d="M389 374L416 356" fill="none" stroke="#2368b4" stroke-width="4" stroke-linecap="round"/>
+  <path d="M323 393C328 414 326 431 315 446" fill="none" stroke="#123f78" stroke-width="4" stroke-linecap="round"/>
+  <path d="M282 466C306 491 348 493 374 467" fill="none" stroke="#e58c7a" stroke-width="6" stroke-linecap="round"/>
+  <path d="M293 466C314 478 342 479 362 466" fill="none" stroke="#123f78" stroke-width="3" stroke-linecap="round" opacity=".5"/>
+  <path d="M238 420C223 421 216 408 224 395" fill="none" stroke="#e58c7a" stroke-width="5" stroke-linecap="round"/>
+  <path d="M406 420C422 421 429 408 420 395" fill="none" stroke="#e58c7a" stroke-width="5" stroke-linecap="round"/>
+
+  <path d="M258 526C278 552 366 552 388 526" fill="none" stroke="#2368b4" stroke-width="6" stroke-linecap="round"/>
+  <path d="M224 564C248 622 397 623 421 564" fill="#ffffff" stroke="#123f78" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M241 604C252 682 268 724 322 724C376 724 392 682 403 604" fill="#ffffff" stroke="#123f78" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M268 599C286 636 358 637 377 599" fill="none" stroke="#2368b4" stroke-width="5" stroke-linecap="round"/>
+  <path d="M323 594L323 718" fill="none" stroke="#b9d6f3" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="308" cy="632" r="5" fill="#2368b4"/>
+  <circle cx="308" cy="676" r="5" fill="#2368b4"/>
+  <circle cx="338" cy="632" r="5" fill="#2368b4"/>
+  <circle cx="338" cy="676" r="5" fill="#2368b4"/>
+
+  <path d="M167 675C207 718 440 718 481 675" fill="none" stroke="#2368b4" stroke-width="8" stroke-linecap="round"/>
+  <path d="M174 677C206 628 251 603 319 604C390 604 438 630 474 677" fill="none" stroke="#123f78" stroke-width="7" stroke-linecap="round"/>
+  <path d="M193 698L247 642" fill="none" stroke="#123f78" stroke-width="6" stroke-linecap="round"/>
+  <path d="M247 698L193 642" fill="none" stroke="#123f78" stroke-width="6" stroke-linecap="round"/>
+  <path d="M195 639C219 620 242 622 264 641" fill="none" stroke="#2368b4" stroke-width="5" stroke-linecap="round"/>
+
+  <path d="M486 681L542 625" fill="none" stroke="#123f78" stroke-width="6" stroke-linecap="round"/>
+  <path d="M542 681L486 625" fill="none" stroke="#123f78" stroke-width="6" stroke-linecap="round"/>
+  <path d="M492 620C514 603 537 604 558 622" fill="none" stroke="#2368b4" stroke-width="5" stroke-linecap="round"/>
+
+  <path d="M116 546C138 526 163 525 182 546C161 567 137 568 116 546Z" fill="#ffffff" stroke="#6fa59a" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M151 546C153 514 169 488 196 476" fill="none" stroke="#6fa59a" stroke-width="5" stroke-linecap="round"/>
+  <path d="M196 476C188 451 203 429 230 422C239 449 225 470 196 476Z" fill="#ffffff" stroke="#e58c7a" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M526 540C502 519 478 522 460 544C484 563 508 560 526 540Z" fill="#ffffff" stroke="#6fa59a" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M493 541C484 512 463 490 434 481" fill="none" stroke="#6fa59a" stroke-width="5" stroke-linecap="round"/>
+  <path d="M434 481C440 454 422 435 395 431C388 458 404 477 434 481Z" fill="#ffffff" stroke="#e58c7a" stroke-width="5" stroke-linejoin="round"/>
+
+  <circle cx="289" cy="382" r="3" fill="#123f78"/>
+  <circle cx="361" cy="382" r="3" fill="#123f78"/>
+  <circle cx="175" cy="173" r="4" fill="#e58c7a"/>
+  <circle cx="470" cy="190" r="4" fill="#e58c7a"/>
+  <circle cx="196" cy="476" r="4" fill="#2368b4"/>
+  <circle cx="434" cy="481" r="4" fill="#2368b4"/>
+</svg>
