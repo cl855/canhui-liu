@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Risk Topic Analysis: 5-Platform Comparison</title>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2d3148;
+    --text: #e8eaf6;
+    --text-muted: #8892b0;
+    --accent: #7c83fd;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; line-height: 1.6; }
+  
+  /* Header */
+  .header { background: linear-gradient(135deg, #1a1d27 0%, #0f1117 100%); border-bottom: 1px solid var(--border); padding: 40px 60px; }
+  .header h1 { font-size: 2.2rem; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+  .header p { color: var(--text-muted); font-size: 1rem; max-width: 800px; }
+  .header .meta { margin-top: 16px; display: flex; gap: 24px; flex-wrap: wrap; }
+  .header .meta-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 16px; font-size: 0.85rem; }
+  .header .meta-item strong { color: var(--accent); }
+  
+  /* Nav */
+  .nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 60px; position: sticky; top: 0; z-index: 100; }
+  .nav ul { display: flex; list-style: none; gap: 0; }
+  .nav ul li a { display: block; padding: 16px 20px; color: var(--text-muted); text-decoration: none; font-size: 0.9rem; border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .nav ul li a:hover, .nav ul li a.active { color: var(--accent); border-bottom-color: var(--accent); }
+  
+  /* Main */
+  .main { max-width: 1400px; margin: 0 auto; padding: 40px 60px; }
+  
+  /* Section */
+  .section { margin-bottom: 60px; }
+  .section-title { font-size: 1.5rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .section-subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px; }
+  
+  /* Platform cards */
+  .platform-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 40px; }
+  .platform-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; transition: transform 0.2s; }
+  .platform-card:hover { transform: translateY(-2px); }
+  .platform-name { font-size: 1rem; font-weight: 700; margin-bottom: 10px; }
+  .platform-stats { display: flex; gap: 16px; margin-bottom: 8px; }
+  .stat-item { font-size: 0.85rem; color: var(--text-muted); }
+  .stat-item strong { color: var(--text); }
+  .platform-top-domain { font-size: 0.85rem; color: var(--text-muted); }
+  .platform-top-domain strong { color: var(--text); }
+  
+  /* Chart containers */
+  .chart-container { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+  .chart-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; }
+  .chart-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px; }
+  .chart-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  
+  /* Topic tables */
+  .topic-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+  .topic-tab { padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); cursor: pointer; font-size: 0.85rem; transition: all 0.2s; }
+  .topic-tab.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .platform-topic-section { display: none; }
+  .platform-topic-section.active { display: block; }
+  .topic-meta { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px; }
+  .topic-table { width: 100%; border-collapse: collapse; }
+  .topic-table th { background: var(--surface2); padding: 10px 12px; text-align: left; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .topic-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+  .topic-table tr:last-child td { border-bottom: none; }
+  .rank { color: var(--text-muted); font-size: 0.8rem; width: 30px; }
+  .topic-name { max-width: 400px; }
+  .topic-count { color: var(--text-muted); font-size: 0.85rem; width: 80px; }
+  .topic-pct { width: 200px; }
+  .pct-bar-container { display: flex; align-items: center; gap: 8px; }
+  .pct-bar { height: 8px; border-radius: 4px; min-width: 2px; }
+  .pct-bar-container span { font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; }
+  
+  /* Temporal tabs */
+  .temporal-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+  .temporal-tab { padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); cursor: pointer; font-size: 0.85rem; transition: all 0.2s; }
+  .temporal-tab.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .temporal-section { display: none; }
+  .temporal-section.active { display: block; }
+  
+  /* Methodology note */
+  .methodology { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+  .methodology h3 { font-size: 1rem; font-weight: 700; margin-bottom: 12px; color: var(--accent); }
+  .methodology p { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 8px; }
+  .methodology table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.85rem; }
+  .methodology th { background: var(--surface2); padding: 8px 12px; text-align: left; color: var(--text-muted); }
+  .methodology td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  .methodology tr:last-child td { border-bottom: none; }
+  
+  @media (max-width: 768px) {
+    .header, .main { padding: 20px; }
+    .nav { padding: 0 20px; }
+    .chart-grid-2 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>AI Risk Topic Analysis: 5-Platform Comparison</h1>
+  <p>Cross-platform topic modeling and MIT AI Risk taxonomy classification across EA Forum, LessWrong, Open Philanthropy grants, Reddit AI Risk communities, and OpenAlex AI Safety academic literature.</p>
+  <div class="meta">
+    <div class="meta-item">Platforms: <strong>5</strong></div>
+    <div class="meta-item">Total Documents: <strong>125,761</strong></div>
+    <div class="meta-item">Topic Models: <strong>BERTopic (grounded)</strong></div>
+    <div class="meta-item">Risk Taxonomy: <strong>MIT AI Risk (7 domains, 24 subcategories)</strong></div>
+    <div class="meta-item">Generated: <strong>May 2026</strong></div>
+  </div>
+</div>
+
+<nav class="nav">
+  <ul>
+    <li><a href="#overview" class="active">Overview</a></li>
+    <li><a href="#risk-domains">Risk Domains</a></li>
+    <li><a href="#topics">BERTopic</a></li>
+    <li><a href="#temporal">Temporal</a></li>
+    <li><a href="#methodology">Methodology</a></li>
+  </ul>
+</nav>
+
+<div class="main">
+
+<!-- OVERVIEW -->
+<section class="section" id="overview">
+  <div class="section-title">Platform Overview</div>
+  <div class="section-subtitle">Five distinct AI safety discourse communities analyzed with grounded BERTopic modeling and MIT AI Risk deductive classification.</div>
+  <div class="platform-cards">
+    
+    <div class="platform-card" style="border-left: 4px solid #4CAF50">
+        <div class="platform-name" style="color: #4CAF50">EA Forum</div>
+        <div class="platform-stats">
+            <span class="stat-item"><strong>42,131</strong> documents</span>
+            <span class="stat-item"><strong>69</strong> topics</span>
+        </div>
+        <div class="platform-top-domain">Top risk: <strong>Socioeconomic</strong> (35.7%)</div>
+    </div>
+    <div class="platform-card" style="border-left: 4px solid #2196F3">
+        <div class="platform-name" style="color: #2196F3">LessWrong</div>
+        <div class="platform-stats">
+            <span class="stat-item"><strong>77,888</strong> documents</span>
+            <span class="stat-item"><strong>42</strong> topics</span>
+        </div>
+        <div class="platform-top-domain">Top risk: <strong>AI Safety</strong> (29.0%)</div>
+    </div>
+    <div class="platform-card" style="border-left: 4px solid #FF9800">
+        <div class="platform-name" style="color: #FF9800">Open Philanthropy</div>
+        <div class="platform-stats">
+            <span class="stat-item"><strong>527</strong> documents</span>
+            <span class="stat-item"><strong>38</strong> topics</span>
+        </div>
+        <div class="platform-top-domain">Top risk: <strong>Socioeconomic</strong> (45.4%)</div>
+    </div>
+    <div class="platform-card" style="border-left: 4px solid #FF5722">
+        <div class="platform-name" style="color: #FF5722">Reddit (r/AIRisk etc.)</div>
+        <div class="platform-stats">
+            <span class="stat-item"><strong>4,297</strong> documents</span>
+            <span class="stat-item"><strong>85</strong> topics</span>
+        </div>
+        <div class="platform-top-domain">Top risk: <strong>AI Safety</strong> (80.4%)</div>
+    </div>
+    <div class="platform-card" style="border-left: 4px solid #9C27B0">
+        <div class="platform-name" style="color: #9C27B0">OpenAlex AI Safety</div>
+        <div class="platform-stats">
+            <span class="stat-item"><strong>918</strong> documents</span>
+            <span class="stat-item"><strong>31</strong> topics</span>
+        </div>
+        <div class="platform-top-domain">Top risk: <strong>AI Safety</strong> (32.9%)</div>
+    </div>
+  </div>
+</section>
+
+<!-- RISK DOMAINS -->
+<section class="section" id="risk-domains">
+  <div class="section-title">MIT AI Risk Domain Distribution</div>
+  <div class="section-subtitle">Deductive classification using sentence-BERT similarity to MIT AI Risk taxonomy (7 domains, 24 subcategories). Each document is assigned to its closest risk domain.</div>
+  
+  <div class="chart-container">
+    <div class="chart-title">Risk Domain Distribution by Platform (%)</div>
+    <div class="chart-desc">Percentage of documents classified to each MIT AI Risk domain, grouped by platform.</div>
+    <div id="risk-bar-chart" style="height: 480px;"></div>
+  </div>
+  
+  <div class="chart-grid-2">
+    <div class="chart-container">
+      <div class="chart-title">Cross-Platform Risk Heatmap</div>
+      <div class="chart-desc">Risk domain coverage intensity across all 5 platforms (% of documents).</div>
+      <div id="risk-heatmap" style="height: 380px;"></div>
+    </div>
+    <div class="chart-container">
+      <div class="chart-title">Risk Domain Radar Chart</div>
+      <div class="chart-desc">Comparative risk profile across all 7 MIT AI Risk domains.</div>
+      <div id="risk-radar" style="height: 380px;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- BERTOPIC -->
+<section class="section" id="topics">
+  <div class="section-title">BERTopic: Grounded Topic Discovery</div>
+  <div class="section-subtitle">Inductive topic modeling using BERTopic (all-MiniLM-L6-v2 embeddings + HDBSCAN clustering). Topics are discovered from the data without predefined categories.</div>
+  
+  <div class="chart-container">
+    <div class="chart-title">Top Topics by Platform</div>
+    <div class="chart-desc">Select a platform to view its top 15 discovered topics ranked by document frequency.</div>
+    
+    <div class="topic-tabs" id="topic-tabs">
+      <div class="topic-tab active" onclick="showTopics('EA-Forum', this)">EA Forum</div>
+      <div class="topic-tab" onclick="showTopics('LessWrong', this)">LessWrong</div>
+      <div class="topic-tab" onclick="showTopics('Open-Philanthropy', this)">Open Philanthropy</div>
+      <div class="topic-tab" onclick="showTopics('Reddit-rAIRisk-etc-', this)">Reddit AI Risk</div>
+      <div class="topic-tab" onclick="showTopics('OpenAlex-AI-Safety', this)">OpenAlex</div>
+    </div>
+    
+    <div id="topic-content">
+      
+    <div class="platform-topic-section" id="topics-EA-Forum">
+        <h3 style="color: #4CAF50; border-bottom: 2px solid #4CAF50; padding-bottom: 8px;">EA Forum</h3>
+        <p class="topic-meta">42,131 documents · 69 topics discovered</p>
+        <table class="topic-table">
+            <thead><tr><th>#</th><th>Topic</th><th>Count</th><th>Share</th></tr></thead>
+            <tbody>
+        <tr>
+            <td class="rank">1</td>
+            <td class="topic-name">ftx sbf sam alameda</td>
+            <td class="topic-count">306</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:2.2%; background:#4CAF50"></div>
+                    <span>0.7%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">2</td>
+            <td class="topic-name">grant grants funding fund</td>
+            <td class="topic-count">255</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:1.8%; background:#4CAF50"></div>
+                    <span>0.6%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">3</td>
+            <td class="topic-name">altruism effective altruism effective ea</td>
+            <td class="topic-count">248</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:1.8%; background:#4CAF50"></div>
+                    <span>0.6%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">4</td>
+            <td class="topic-name">alice nonlinear kat chloe</td>
+            <td class="topic-count">246</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:1.8%; background:#4CAF50"></div>
+                    <span>0.6%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">5</td>
+            <td class="topic-name">health pain mental mental health</td>
+            <td class="topic-count">227</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:1.6%; background:#4CAF50"></div>
+                    <span>0.5%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">6</td>
+            <td class="topic-name">safety ai safety ai research</td>
+            <td class="topic-count">173</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:1.2%; background:#4CAF50"></div>
+                    <span>0.4%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">7</td>
+            <td class="topic-name">forum posts post ea forum</td>
+            <td class="topic-count">167</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:1.2%; background:#4CAF50"></div>
+                    <span>0.4%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">8</td>
+            <td class="topic-name">ea community people eas</td>
+            <td class="topic-count">165</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:1.2%; background:#4CAF50"></div>
+                    <span>0.4%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">9</td>
+            <td class="topic-name">event conference attendees events</td>
+            <td class="topic-count">161</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:1.1%; background:#4CAF50"></div>
+                    <span>0.4%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">10</td>
+            <td class="topic-name">pledge giving donate donations</td>
+            <td class="topic-count">141</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:1.0%; background:#4CAF50"></div>
+                    <span>0.3%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">11</td>
+            <td class="topic-name">biosecurity pandemic covid biological</td>
+            <td class="topic-count">140</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:1.0%; background:#4CAF50"></div>
+                    <span>0.3%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">12</td>
+            <td class="topic-name">women sexual gender men</td>
+            <td class="topic-count">137</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:1.0%; background:#4CAF50"></div>
+                    <span>0.3%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">13</td>
+            <td class="topic-name">future longtermism risk long</td>
+            <td class="topic-count">131</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:0.9%; background:#4CAF50"></div>
+                    <span>0.3%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">14</td>
+            <td class="topic-name">animal animal advocacy advocacy aac</td>
+            <td class="topic-count">126</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:0.9%; background:#4CAF50"></div>
+                    <span>0.3%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">15</td>
+            <td class="topic-name">groups group ea organizers</td>
+            <td class="topic-count">121</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:0.9%; background:#4CAF50"></div>
+                    <span>0.3%</span>
+                </div>
+            </td>
+        </tr></tbody>
+        </table>
+    </div>
+    <div class="platform-topic-section" id="topics-LessWrong">
+        <h3 style="color: #2196F3; border-bottom: 2px solid #2196F3; padding-bottom: 8px;">LessWrong</h3>
+        <p class="topic-meta">77,888 documents · 42 topics discovered</p>
+        <table class="topic-table">
+            <thead><tr><th>#</th><th>Topic</th><th>Count</th><th>Share</th></tr></thead>
+            <tbody>
+        <tr>
+            <td class="rank">1</td>
+            <td class="topic-name">ai risk humans systems</td>
+            <td class="topic-count">178</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:0.7%; background:#2196F3"></div>
+                    <span>0.2%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">2</td>
+            <td class="topic-name">time work people things</td>
+            <td class="topic-count">117</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:0.5%; background:#2196F3"></div>
+                    <span>0.2%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">3</td>
+            <td class="topic-name">people like think person</td>
+            <td class="topic-count">111</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:0.4%; background:#2196F3"></div>
+                    <span>0.1%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">4</td>
+            <td class="topic-name">ai funding people think</td>
+            <td class="topic-count">95</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:0.4%; background:#2196F3"></div>
+                    <span>0.1%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">5</td>
+            <td class="topic-name">alignment ai problem research</td>
+            <td class="topic-count">87</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:0.3%; background:#2196F3"></div>
+                    <span>0.1%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">6</td>
+            <td class="topic-name">openai anthropic altman board</td>
+            <td class="topic-count">80</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:0.3%; background:#2196F3"></div>
+                    <span>0.1%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">7</td>
+            <td class="topic-name">covid vaccine people 19</td>
+            <td class="topic-count">73</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:0.3%; background:#2196F3"></div>
+                    <span>0.1%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">8</td>
+            <td class="topic-name">lesswrong posts post users</td>
+            <td class="topic-count">72</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:0.3%; background:#2196F3"></div>
+                    <span>0.1%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">9</td>
+            <td class="topic-name">ai 2027 years timelines</td>
+            <td class="topic-count">66</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:0.3%; background:#2196F3"></div>
+                    <span>0.1%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">10</td>
+            <td class="topic-name">gpt token tokens prompt</td>
+            <td class="topic-count">65</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:0.3%; background:#2196F3"></div>
+                    <span>0.1%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">11</td>
+            <td class="topic-name">self meditation emotional feel</td>
+            <td class="topic-count">65</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:0.3%; background:#2196F3"></div>
+                    <span>0.1%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">12</td>
+            <td class="topic-name">safety ai ai safety et al</td>
+            <td class="topic-count">62</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:0.2%; background:#2196F3"></div>
+                    <span>0.1%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">13</td>
+            <td class="topic-name">features feature network model</td>
+            <td class="topic-count">54</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:0.2%; background:#2196F3"></div>
+                    <span>0.1%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">14</td>
+            <td class="topic-name">lithium weight cancer vegan</td>
+            <td class="topic-count">53</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:0.2%; background:#2196F3"></div>
+                    <span>0.1%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">15</td>
+            <td class="topic-name">model models training reward</td>
+            <td class="topic-count">50</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:0.2%; background:#2196F3"></div>
+                    <span>0.1%</span>
+                </div>
+            </td>
+        </tr></tbody>
+        </table>
+    </div>
+    <div class="platform-topic-section" id="topics-Open-Philanthropy">
+        <h3 style="color: #FF9800; border-bottom: 2px solid #FF9800; padding-bottom: 8px;">Open Philanthropy</h3>
+        <p class="topic-meta">527 documents · 38 topics discovered</p>
+        <table class="topic-table">
+            <thead><tr><th>#</th><th>Topic</th><th>Count</th><th>Share</th></tr></thead>
+            <tbody>
+        <tr>
+            <td class="rank">1</td>
+            <td class="topic-name">safety ai safety ai london</td>
+            <td class="topic-count">30</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:17.1%; background:#FF9800"></div>
+                    <span>5.7%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">2</td>
+            <td class="topic-name">cea effective altruism altruism effective</td>
+            <td class="topic-count">29</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:16.5%; background:#FF9800"></div>
+                    <span>5.5%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">3</td>
+            <td class="topic-name">llm benchmark agents llm agents</td>
+            <td class="topic-count">28</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:15.9%; background:#FF9800"></div>
+                    <span>5.3%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">4</td>
+            <td class="topic-name">berkeley existential berkeley risk initiative existential risk</td>
+            <td class="topic-count">22</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:12.5%; background:#FF9800"></div>
+                    <span>4.2%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">5</td>
+            <td class="topic-name">existential existential risk risk existential risks</td>
+            <td class="topic-count">18</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:10.2%; background:#FF9800"></div>
+                    <span>3.4%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">6</td>
+            <td class="topic-name">adversarial adversarial robustness robustness means</td>
+            <td class="topic-count">16</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:9.1%; background:#FF9800"></div>
+                    <span>3.0%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">7</td>
+            <td class="topic-name">effective ventures ventures foundation ventures foundation</td>
+            <td class="topic-count">16</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:9.1%; background:#FF9800"></div>
+                    <span>3.0%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">8</td>
+            <td class="topic-name">governance ai governance governance ai centre governance</td>
+            <td class="topic-count">15</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:8.5%; background:#FF9800"></div>
+                    <span>2.8%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">9</td>
+            <td class="topic-name">alignment ai alignment alignment research university</td>
+            <td class="topic-count">14</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:8.0%; background:#FF9800"></div>
+                    <span>2.7%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">10</td>
+            <td class="topic-name">fellowship good policy training</td>
+            <td class="topic-count">14</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:8.0%; background:#FF9800"></div>
+                    <span>2.7%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">11</td>
+            <td class="topic-name">far far ai redwood research redwood</td>
+            <td class="topic-count">13</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:7.4%; background:#FF9800"></div>
+                    <span>2.5%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">12</td>
+            <td class="topic-name">course development courses university</td>
+            <td class="topic-count">13</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:7.4%; background:#FF9800"></div>
+                    <span>2.5%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">13</td>
+            <td class="topic-name">80 000 hours 80 000</td>
+            <td class="topic-count">13</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:7.4%; background:#FF9800"></div>
+                    <span>2.5%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">14</td>
+            <td class="topic-name">learning machine learning machine professor</td>
+            <td class="topic-count">13</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:7.4%; background:#FF9800"></div>
+                    <span>2.5%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">15</td>
+            <td class="topic-name">governance climate management source</td>
+            <td class="topic-count">12</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:6.8%; background:#FF9800"></div>
+                    <span>2.3%</span>
+                </div>
+            </td>
+        </tr></tbody>
+        </table>
+    </div>
+    <div class="platform-topic-section" id="topics-Reddit-r-AIRisk-etc.">
+        <h3 style="color: #FF5722; border-bottom: 2px solid #FF5722; padding-bottom: 8px;">Reddit (r/AIRisk etc.)</h3>
+        <p class="topic-meta">4,297 documents · 85 topics discovered</p>
+        <table class="topic-table">
+            <thead><tr><th>#</th><th>Topic</th><th>Count</th><th>Share</th></tr></thead>
+            <tbody>
+        <tr>
+            <td class="rank">1</td>
+            <td class="topic-name">ai risk ai intelligence ethical</td>
+            <td class="topic-count">145</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:10.1%; background:#FF5722"></div>
+                    <span>3.4%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">2</td>
+            <td class="topic-name">cybersecurity security cyber threats</td>
+            <td class="topic-count">105</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:7.3%; background:#FF5722"></div>
+                    <span>2.4%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">3</td>
+            <td class="topic-name">art generative generative ai images</td>
+            <td class="topic-count">87</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:6.1%; background:#FF5722"></div>
+                    <span>2.0%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">4</td>
+            <td class="topic-name">war units game opponents</td>
+            <td class="topic-count">84</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:5.9%; background:#FF5722"></div>
+                    <span>2.0%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">5</td>
+            <td class="topic-name">data science machine learning machine hiring</td>
+            <td class="topic-count">77</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:5.4%; background:#FF5722"></div>
+                    <span>1.8%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">6</td>
+            <td class="topic-name">financial fraud banking finance</td>
+            <td class="topic-count">72</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:5.0%; background:#FF5722"></div>
+                    <span>1.7%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">7</td>
+            <td class="topic-name">healthcare medical medicine clinical</td>
+            <td class="topic-count">69</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:4.8%; background:#FF5722"></div>
+                    <span>1.6%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">8</td>
+            <td class="topic-name">code 3y6gq 3y6gq code delphia</td>
+            <td class="topic-count">65</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:4.5%; background:#FF5722"></div>
+                    <span>1.5%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">9</td>
+            <td class="topic-name">cryptocurrency crypto trading cryptocurrencies</td>
+            <td class="topic-count">64</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:4.5%; background:#FF5722"></div>
+                    <span>1.5%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">10</td>
+            <td class="topic-name">automation technologies business industry</td>
+            <td class="topic-count">63</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:4.4%; background:#FF5722"></div>
+                    <span>1.5%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">11</td>
+            <td class="topic-name">career im degree job</td>
+            <td class="topic-count">61</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:4.3%; background:#FF5722"></div>
+                    <span>1.4%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">12</td>
+            <td class="topic-name">musk elon pause elon musk</td>
+            <td class="topic-count">59</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:4.1%; background:#FF5722"></div>
+                    <span>1.4%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">13</td>
+            <td class="topic-name">3y6gq code 3y6gq code delphia</td>
+            <td class="topic-count">52</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:3.6%; background:#FF5722"></div>
+                    <span>1.2%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">14</td>
+            <td class="topic-name">3y6gq code 3y6gq code delphia</td>
+            <td class="topic-count">46</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:3.2%; background:#FF5722"></div>
+                    <span>1.1%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">15</td>
+            <td class="topic-name">european eu act highrisk</td>
+            <td class="topic-count">45</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:3.1%; background:#FF5722"></div>
+                    <span>1.0%</span>
+                </div>
+            </td>
+        </tr></tbody>
+        </table>
+    </div>
+    <div class="platform-topic-section" id="topics-OpenAlex-AI-Safety">
+        <h3 style="color: #9C27B0; border-bottom: 2px solid #9C27B0; padding-bottom: 8px;">OpenAlex AI Safety</h3>
+        <p class="topic-meta">918 documents · 31 topics discovered</p>
+        <table class="topic-table">
+            <thead><tr><th>#</th><th>Topic</th><th>Count</th><th>Share</th></tr></thead>
+            <tbody>
+        <tr>
+            <td class="rank">1</td>
+            <td class="topic-name">AI governance and international policy</td>
+            <td class="topic-count">88</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:28.8%; background:#9C27B0"></div>
+                    <span>9.6%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">2</td>
+            <td class="topic-name">Consciousness and Cognitive Architecture</td>
+            <td class="topic-count">48</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:15.7%; background:#9C27B0"></div>
+                    <span>5.2%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">3</td>
+            <td class="topic-name">LLM Security and Attack Mitigation</td>
+            <td class="topic-count">46</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:15.0%; background:#9C27B0"></div>
+                    <span>5.0%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">4</td>
+            <td class="topic-name">AI in Healthcare and Clinical Ethics</td>
+            <td class="topic-count">40</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:13.1%; background:#9C27B0"></div>
+                    <span>4.4%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">5</td>
+            <td class="topic-name">AI Value Alignment and Ethics</td>
+            <td class="topic-count">32</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:10.5%; background:#9C27B0"></div>
+                    <span>3.5%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">6</td>
+            <td class="topic-name">Adversarial Robustness in Machine Learning</td>
+            <td class="topic-count">29</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:9.5%; background:#9C27B0"></div>
+                    <span>3.2%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">7</td>
+            <td class="topic-name">AI Agents and Human Goal Alignment</td>
+            <td class="topic-count">26</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:8.5%; background:#9C27B0"></div>
+                    <span>2.8%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">8</td>
+            <td class="topic-name">AI Security and Cyberattack Challenges</td>
+            <td class="topic-count">25</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:8.2%; background:#9C27B0"></div>
+                    <span>2.7%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">9</td>
+            <td class="topic-name">Reinforcement Learning Agent Safety</td>
+            <td class="topic-count">25</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:8.2%; background:#9C27B0"></div>
+                    <span>2.7%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">10</td>
+            <td class="topic-name">AI ethics and digital minds governance</td>
+            <td class="topic-count">24</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:7.8%; background:#9C27B0"></div>
+                    <span>2.6%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">11</td>
+            <td class="topic-name">AI Safety in Autonomous Vehicles</td>
+            <td class="topic-count">19</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:6.2%; background:#9C27B0"></div>
+                    <span>2.1%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">12</td>
+            <td class="topic-name">Safety in Large Language Models</td>
+            <td class="topic-count">19</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:6.2%; background:#9C27B0"></div>
+                    <span>2.1%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">13</td>
+            <td class="topic-name">Large Language Model Behavior and Alignment</td>
+            <td class="topic-count">17</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:5.6%; background:#9C27B0"></div>
+                    <span>1.9%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">14</td>
+            <td class="topic-name">Verifiable AI Governance and Trust</td>
+            <td class="topic-count">16</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:5.2%; background:#9C27B0"></div>
+                    <span>1.7%</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="rank">15</td>
+            <td class="topic-name">LLM Bias and Hallucination Mitigation</td>
+            <td class="topic-count">16</td>
+            <td class="topic-pct">
+                <div class="pct-bar-container">
+                    <div class="pct-bar" style="width:5.2%; background:#9C27B0"></div>
+                    <span>1.7%</span>
+                </div>
+            </td>
+        </tr></tbody>
+        </table>
+    </div>
+    </div>
+  </div>
+  
+  <div class="chart-container">
+    <div class="chart-title">Topic Count Comparison</div>
+    <div class="chart-desc">Number of distinct topics discovered per platform (excluding outlier cluster -1).</div>
+    <div id="topic-count-chart" style="height: 300px;"></div>
+  </div>
+</section>
+
+<!-- TEMPORAL -->
+<section class="section" id="temporal">
+  <div class="section-title">Temporal Trends</div>
+  <div class="section-subtitle">Evolution of risk domain focus over time across platforms (stacked area by year).</div>
+  
+  <div class="chart-container">
+    <div class="temporal-tabs" id="temporal-tabs">
+      <div class="temporal-tab active" onclick="showTemporal('ea_forum', this)">EA Forum</div>
+      <div class="temporal-tab" onclick="showTemporal('lesswrong', this)">LessWrong</div>
+      <div class="temporal-tab" onclick="showTemporal('open_philanthropy', this)">Open Philanthropy</div>
+      <div class="temporal-tab" onclick="showTemporal('reddit', this)">Reddit AI Risk</div>
+      <div class="temporal-tab" onclick="showTemporal('openalex', this)">OpenAlex</div>
+    </div>
+    
+    <div id="temporal-ea_forum" class="temporal-section active" style="height: 400px;"></div>
+    <div id="temporal-lesswrong" class="temporal-section" style="height: 400px;"></div>
+    <div id="temporal-open_philanthropy" class="temporal-section" style="height: 400px;"></div>
+    <div id="temporal-reddit" class="temporal-section" style="height: 400px;"></div>
+    <div id="temporal-openalex" class="temporal-section" style="height: 400px;"></div>
+  </div>
+</section>
+
+<!-- METHODOLOGY -->
+<section class="section" id="methodology">
+  <div class="section-title">Methodology</div>
+  <div class="methodology">
+    <h3>Data Sources & Processing</h3>
+    <p>This analysis combines five distinct AI safety discourse communities, each processed through a two-stage topic modeling pipeline:</p>
+    <p><strong>Stage 1 — Grounded (BERTopic):</strong> Inductive topic discovery using sentence-BERT embeddings (all-MiniLM-L6-v2), UMAP dimensionality reduction, and HDBSCAN clustering. Topics emerge from the data without predefined categories.</p>
+    <p><strong>Stage 2 — Deductive (MIT AI Risk):</strong> Each document is classified against the MIT AI Risk taxonomy (7 domains, 24 subcategories) using cosine similarity between document embeddings and category descriptions.</p>
+    
+    <table>
+      <thead><tr><th>Platform</th><th>Type</th><th>Documents</th><th>Date Range</th><th>BERTopic Fit Sample</th><th>Topics</th></tr></thead>
+      <tbody>
+        <tr><td>EA Forum</td><td>Community (posts + comments)</td><td>42,131</td><td>2011–2026</td><td>10,000 (top karma)</td><td>69</td></tr>
+        <tr><td>LessWrong</td><td>Community (posts + comments)</td><td>77,888</td><td>2009–2025</td><td>3,000 (top karma)</td><td>42</td></tr>
+        <tr><td>Open Philanthropy</td><td>Grant database</td><td>527</td><td>2015–2025</td><td>All</td><td>38</td></tr>
+        <tr><td>Reddit AI Risk</td><td>Community (posts)</td><td>4,297</td><td>2016–2026</td><td>All</td><td>85</td></tr>
+        <tr><td>OpenAlex AI Safety</td><td>Academic papers</td><td>918</td><td>2015–2025</td><td>All</td><td>31</td></tr>
+      </tbody>
+    </table>
+    
+    <h3 style="margin-top: 20px;">MIT AI Risk Taxonomy (7 Domains)</h3>
+    <table>
+      <thead><tr><th>Domain</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Discrimination & Toxicity</td><td>Unfair treatment, bias, toxic content generation</td></tr>
+        <tr><td>Privacy & Security</td><td>Data privacy violations, security vulnerabilities</td></tr>
+        <tr><td>Misinformation</td><td>False information, hallucinations, deceptive content</td></tr>
+        <tr><td>Malicious Actors & Misuse</td><td>Cyberattacks, weapon development, harmful use</td></tr>
+        <tr><td>Human-Computer Interaction</td><td>Overreliance, unsafe use, human autonomy</td></tr>
+        <tr><td>Socioeconomic & Environmental Harms</td><td>Job displacement, economic disruption, environmental impact</td></tr>
+        <tr><td>AI System Safety, Failures & Limitations</td><td>Alignment failures, capability limitations, existential risk</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</div><!-- end main -->
+
+<script>
+// ─── DATA ───
+const riskBarData = [{"name": "EA Forum", "x": ["Discrimination", "Privacy & Security", "Misinformation", "Malicious Use", "HCI", "Socioeconomic", "AI Safety"], "y": [6.93, 0.87, 4.59, 11.62, 10.81, 35.71, 29.48], "type": "bar", "marker": {"color": "#4CAF50"}}, {"name": "LessWrong", "x": ["Discrimination", "Privacy & Security", "Misinformation", "Malicious Use", "HCI", "Socioeconomic", "AI Safety"], "y": [6.52, 3.36, 15.09, 10.51, 14.86, 20.66, 29.0], "type": "bar", "marker": {"color": "#2196F3"}}, {"name": "Open Philanthropy", "x": ["Discrimination", "Privacy & Security", "Misinformation", "Malicious Use", "HCI", "Socioeconomic", "AI Safety"], "y": [4.55, 4.93, 0.19, 15.75, 4.36, 45.35, 24.86], "type": "bar", "marker": {"color": "#FF9800"}}, {"name": "Reddit (r/AIRisk etc.)", "x": ["Discrimination", "Privacy & Security", "Misinformation", "Malicious Use", "HCI", "Socioeconomic", "AI Safety"], "y": [0.57, 13.1, 0.53, 3.68, 0.27, 1.41, 80.44], "type": "bar", "marker": {"color": "#FF5722"}}, {"name": "OpenAlex AI Safety", "x": ["Discrimination", "Privacy & Security", "Misinformation", "Malicious Use", "HCI", "Socioeconomic", "AI Safety"], "y": [2.83, 3.27, 0.87, 2.07, 3.27, 5.77, 32.9], "type": "bar", "marker": {"color": "#9C27B0"}}];
+const radarData = [{"type": "scatterpolar", "r": [6.93, 0.87, 4.59, 11.62, 10.81, 35.71, 29.48, 6.93], "theta": ["Discrimination", "Privacy & Security", "Misinformation", "Malicious Use", "HCI", "Socioeconomic", "AI Safety", "Discrimination"], "fill": "toself", "name": "EA Forum", "line": {"color": "#4CAF50"}, "opacity": 0.6}, {"type": "scatterpolar", "r": [6.52, 3.36, 15.09, 10.51, 14.86, 20.66, 29.0, 6.52], "theta": ["Discrimination", "Privacy & Security", "Misinformation", "Malicious Use", "HCI", "Socioeconomic", "AI Safety", "Discrimination"], "fill": "toself", "name": "LessWrong", "line": {"color": "#2196F3"}, "opacity": 0.6}, {"type": "scatterpolar", "r": [4.55, 4.93, 0.19, 15.75, 4.36, 45.35, 24.86, 4.55], "theta": ["Discrimination", "Privacy & Security", "Misinformation", "Malicious Use", "HCI", "Socioeconomic", "AI Safety", "Discrimination"], "fill": "toself", "name": "Open Philanthropy", "line": {"color": "#FF9800"}, "opacity": 0.6}, {"type": "scatterpolar", "r": [0.57, 13.1, 0.53, 3.68, 0.27, 1.41, 80.44, 0.57], "theta": ["Discrimination", "Privacy & Security", "Misinformation", "Malicious Use", "HCI", "Socioeconomic", "AI Safety", "Discrimination"], "fill": "toself", "name": "Reddit (r/AIRisk etc.)", "line": {"color": "#FF5722"}, "opacity": 0.6}, {"type": "scatterpolar", "r": [2.83, 3.27, 0.87, 2.07, 3.27, 5.77, 32.9, 2.83], "theta": ["Discrimination", "Privacy & Security", "Misinformation", "Malicious Use", "HCI", "Socioeconomic", "AI Safety", "Discrimination"], "fill": "toself", "name": "OpenAlex AI Safety", "line": {"color": "#9C27B0"}, "opacity": 0.6}];
+const heatmapZ = [[6.93, 0.87, 4.59, 11.62, 10.81, 35.71, 29.48], [6.52, 3.36, 15.09, 10.51, 14.86, 20.66, 29.0], [4.55, 4.93, 0.19, 15.75, 4.36, 45.35, 24.86], [0.57, 13.1, 0.53, 3.68, 0.27, 1.41, 80.44], [2.83, 3.27, 0.87, 2.07, 3.27, 5.77, 32.9]];
+const heatmapY = ["EA Forum", "LessWrong", "Open Philanthropy", "Reddit (r/AIRisk etc.)", "OpenAlex AI Safety"];
+const heatmapX = ["Discrimination", "Privacy & Security", "Misinformation", "Malicious Use", "HCI", "Socioeconomic", "AI Safety"];
+const temporalCharts = {"ea_forum": {"name": "EA Forum", "traces": [{"x": [2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026], "y": [0, 3, 40, 86, 206, 159, 172, 315, 1011, 1090, 1640, 3530, 3072, 1857, 1862, 0], "name": "Socioeconomic", "type": "scatter", "mode": "lines+markers", "stackgroup": "one", "line": {"color": "#FF9800"}}, {"x": [2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026], "y": [1, 5, 12, 73, 143, 112, 151, 186, 730, 870, 1153, 2728, 2975, 1751, 1529, 1], "name": "AI Safety", "type": "scatter", "mode": "lines+markers", "stackgroup": "one", "line": {"color": "#9C27B0"}}, {"x": [2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026], "y": [0, 0, 1, 21, 54, 38, 47, 64, 248, 380, 435, 1308, 1157, 671, 472, 1], "name": "Malicious Use", "type": "scatter", "mode": "lines+markers", "stackgroup": "one", "line": {"color": "#FF5722"}}, {"x": [2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026], "y": [0, 1, 17, 58, 130, 70, 54, 85, 250, 292, 484, 1065, 1044, 507, 496, 1], "name": "HCI", "type": "scatter", "mode": "lines+markers", "stackgroup": "one", "line": {"color": "#4CAF50"}}, {"x": [2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026], "y": [0, 0, 1, 16, 26, 20, 44, 37, 166, 235, 330, 666, 811, 344, 222, 0], "name": "Discrimination", "type": "scatter", "mode": "lines+markers", "stackgroup": "one", "line": {"color": "#E91E63"}}]}, "lesswrong": {"name": "LessWrong", "traces": [{"x": [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025], "y": [601, 1303, 1498, 1235, 916, 899, 485, 455, 746, 1084, 1194, 1748, 2243, 2769, 2183, 2802], "name": "AI Safety", "type": "scatter", "mode": "lines+markers", "stackgroup": "one", "line": {"color": "#9C27B0"}}, {"x": [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025], "y": [389, 815, 913, 781, 545, 367, 230, 336, 489, 786, 1009, 1273, 1670, 1973, 1865, 2416], "name": "Socioeconomic", "type": "scatter", "mode": "lines+markers", "stackgroup": "one", "line": {"color": "#FF9800"}}, {"x": [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025], "y": [554, 1113, 1313, 881, 716, 461, 289, 281, 375, 518, 580, 680, 804, 990, 780, 988], "name": "Misinformation", "type": "scatter", "mode": "lines+markers", "stackgroup": "one", "line": {"color": "#795548"}}, {"x": [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025], "y": [486, 957, 928, 781, 575, 431, 215, 282, 443, 519, 590, 886, 934, 999, 855, 1310], "name": "HCI", "type": "scatter", "mode": "lines+markers", "stackgroup": "one", "line": {"color": "#4CAF50"}}, {"x": [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025], "y": [258, 548, 689, 476, 422, 258, 131, 136, 210, 302, 607, 653, 754, 959, 699, 956], "name": "Malicious Use", "type": "scatter", "mode": "lines+markers", "stackgroup": "one", "line": {"color": "#FF5722"}}]}, "open_philanthropy": {"name": "Open Philanthropy", "traces": [{"x": [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025], "y": [1, 9, 10, 4, 5, 12, 12, 39, 67, 58, 22], "name": "Socioeconomic", "type": "scatter", "mode": "lines+markers", "stackgroup": "one", "line": {"color": "#FF9800"}}, {"x": [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025], "y": [1, 1, 7, 5, 5, 11, 10, 16, 32, 26, 17], "name": "AI Safety", "type": "scatter", "mode": "lines+markers", "stackgroup": "one", "line": {"color": "#9C27B0"}}, {"x": [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025], "y": [1, 1, 2, 5, 4, 5, 6, 8, 15, 22, 14], "name": "Malicious Use", "type": "scatter", "mode": "lines+markers", "stackgroup": "one", "line": {"color": "#FF5722"}}, {"x": [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025], "y": [0, 0, 0, 2, 0, 0, 12, 4, 2, 4, 2], "name": "Privacy & Security", "type": "scatter", "mode": "lines+markers", "stackgroup": "one", "line": {"color": "#2196F3"}}, {"x": [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025], "y": [0, 0, 0, 0, 0, 1, 2, 2, 9, 6, 4], "name": "Discrimination", "type": "scatter", "mode": "lines+markers", "stackgroup": "one", "line": {"color": "#E91E63"}}]}, "reddit": {"name": "Reddit (r/AIRisk etc.)", "traces": [{"x": [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025], "y": [85, 117, 69, 77, 88, 254, 470, 565, 456, 198], "name": "AI Safety", "type": "scatter", "mode": "lines+markers", "stackgroup": "one", "line": {"color": "#9C27B0"}}, {"x": [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025], "y": [7, 5, 3, 5, 4, 42, 28, 68, 79, 35], "name": "Privacy & Security", "type": "scatter", "mode": "lines+markers", "stackgroup": "one", "line": {"color": "#2196F3"}}, {"x": [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025], "y": [3, 5, 1, 6, 2, 15, 17, 20, 18, 22], "name": "Malicious Use", "type": "scatter", "mode": "lines+markers", "stackgroup": "one", "line": {"color": "#FF5722"}}, {"x": [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025], "y": [1, 2, 2, 2, 3, 7, 6, 5, 9, 7], "name": "Socioeconomic", "type": "scatter", "mode": "lines+markers", "stackgroup": "one", "line": {"color": "#FF9800"}}]}, "openalex": {"name": "OpenAlex AI Safety", "traces": [{"x": [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025], "y": [2, 6, 7, 22, 19, 23, 24, 49, 93, 218], "name": "AI Safety", "type": "scatter", "mode": "lines+markers", "stackgroup": "one", "line": {"color": "#9C27B0"}}, {"x": [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025], "y": [1, 2, 3, 4, 2, 3, 1, 16, 36, 71], "name": "Socioeconomic", "type": "scatter", "mode": "lines+markers", "stackgroup": "one", "line": {"color": "#FF9800"}}, {"x": [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025], "y": [0, 0, 0, 3, 3, 5, 4, 12, 24, 57], "name": "Privacy & Security", "type": "scatter", "mode": "lines+markers", "stackgroup": "one", "line": {"color": "#2196F3"}}, {"x": [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025], "y": [2, 1, 3, 2, 1, 1, 1, 3, 20, 45], "name": "Malicious Use", "type": "scatter", "mode": "lines+markers", "stackgroup": "one", "line": {"color": "#FF5722"}}, {"x": [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025], "y": [0, 0, 0, 1, 2, 1, 0, 3, 9, 26], "name": "Discrimination", "type": "scatter", "mode": "lines+markers", "stackgroup": "one", "line": {"color": "#E91E63"}}]}};
+const bertopicCharts = {"EA Forum": {"names": ["groups group ea organizers", "animal animal advocacy advocacy aac", "future longtermism risk long", "women sexual gender men", "biosecurity pandemic covid biological", "pledge giving donate donations", "event conference attendees events", "ea community people eas", "forum posts post ea forum", "safety ai safety ai research", "health pain mental mental health", "alice nonlinear kat chloe", "altruism effective altruism effective ea", "grant grants funding fund", "ftx sbf sam alameda"], "counts": [121, 126, 131, 137, 140, 141, 161, 165, 167, 173, 227, 246, 248, 255, 306], "color": "#4CAF50"}, "LessWrong": {"names": ["model models training reward", "lithium weight cancer vegan", "features feature network model", "safety ai ai safety et al", "self meditation emotional feel", "gpt token tokens prompt", "ai 2027 years timelines", "lesswrong posts post users", "covid vaccine people 19", "openai anthropic altman board", "alignment ai problem research", "ai funding people think", "people like think person", "time work people things", "ai risk humans systems"], "counts": [50, 53, 54, 62, 65, 65, 66, 72, 73, 80, 87, 95, 111, 117, 178], "color": "#2196F3"}, "Open Philanthropy": {"names": ["governance climate management source", "learning machine learning machine professor", "80 000 hours 80 000", "course development courses university", "far far ai redwood research redwood", "fellowship good policy training", "alignment ai alignment alignment research unive...", "governance ai governance governance ai centre g...", "effective ventures ventures foundation ventures...", "adversarial adversarial robustness robustness m...", "existential existential risk risk existential r...", "berkeley existential berkeley risk initiative e...", "llm benchmark agents llm agents", "cea effective altruism altruism effective", "safety ai safety ai london"], "counts": [12, 13, 13, 13, 13, 14, 14, 15, 16, 16, 18, 22, 28, 29, 30], "color": "#FF9800"}, "Reddit (r/AIRisk etc.)": {"names": ["european eu act highrisk", "3y6gq code 3y6gq code delphia", "3y6gq code 3y6gq code delphia", "musk elon pause elon musk", "career im degree job", "automation technologies business industry", "cryptocurrency crypto trading cryptocurrencies", "code 3y6gq 3y6gq code delphia", "healthcare medical medicine clinical", "financial fraud banking finance", "data science machine learning machine hiring", "war units game opponents", "art generative generative ai images", "cybersecurity security cyber threats", "ai risk ai intelligence ethical"], "counts": [45, 46, 52, 59, 61, 63, 64, 65, 69, 72, 77, 84, 87, 105, 145], "color": "#FF5722"}, "OpenAlex AI Safety": {"names": ["LLM Bias and Hallucination Mitigation", "Verifiable AI Governance and Trust", "Large Language Model Behavior and Alignment", "Safety in Large Language Models", "AI Safety in Autonomous Vehicles", "AI ethics and digital minds governance", "Reinforcement Learning Agent Safety", "AI Security and Cyberattack Challenges", "AI Agents and Human Goal Alignment", "Adversarial Robustness in Machine Learning", "AI Value Alignment and Ethics", "AI in Healthcare and Clinical Ethics", "LLM Security and Attack Mitigation", "Consciousness and Cognitive Architecture", "AI governance and international policy"], "counts": [16, 16, 17, 19, 19, 24, 25, 25, 26, 29, 32, 40, 46, 48, 88], "color": "#9C27B0"}};
+
+const PLATFORM_NAMES = ["EA Forum", "LessWrong", "Open Philanthropy", "Reddit (r/AIRisk etc.)", "OpenAlex AI Safety"];
+const PLATFORM_COLORS = {"EA Forum": "#4CAF50", "LessWrong": "#2196F3", "Open Philanthropy": "#FF9800", "Reddit (r/AIRisk etc.)": "#FF5722", "OpenAlex AI Safety": "#9C27B0"};
+
+const darkLayout = {
+  paper_bgcolor: '#1a1d27',
+  plot_bgcolor: '#1a1d27',
+  font: { color: '#e8eaf6', family: 'Segoe UI, system-ui, sans-serif' },
+  xaxis: { gridcolor: '#2d3148', zerolinecolor: '#2d3148' },
+  yaxis: { gridcolor: '#2d3148', zerolinecolor: '#2d3148' },
+  legend: { bgcolor: '#22263a', bordercolor: '#2d3148', borderwidth: 1 },
+  margin: { t: 20, r: 20, b: 60, l: 60 },
+};
+
+// ─── RISK BAR CHART ───
+Plotly.newPlot('risk-bar-chart', riskBarData, {
+  ...darkLayout,
+  barmode: 'group',
+  xaxis: { ...darkLayout.xaxis, tickangle: -20, tickfont: { size: 11 } },
+  yaxis: { ...darkLayout.yaxis, title: '% of Documents', ticksuffix: '%' },
+  legend: { ...darkLayout.legend, orientation: 'h', y: -0.25 },
+  margin: { t: 20, r: 20, b: 120, l: 60 },
+}, {responsive: true});
+
+// ─── HEATMAP ───
+Plotly.newPlot('risk-heatmap', [{
+  type: 'heatmap',
+  z: heatmapZ,
+  x: heatmapX,
+  y: heatmapY,
+  colorscale: 'Viridis',
+  text: heatmapZ.map(row => row.map(v => v.toFixed(1) + '%')),
+  texttemplate: '%{text}',
+  showscale: true,
+  colorbar: { title: '%', ticksuffix: '%' },
+}], {
+  ...darkLayout,
+  xaxis: { ...darkLayout.xaxis, tickangle: -30, tickfont: { size: 10 } },
+  yaxis: { ...darkLayout.yaxis, tickfont: { size: 10 } },
+  margin: { t: 20, r: 80, b: 100, l: 180 },
+}, {responsive: true});
+
+// ─── RADAR ───
+Plotly.newPlot('risk-radar', radarData, {
+  ...darkLayout,
+  polar: {
+    bgcolor: '#1a1d27',
+    radialaxis: { visible: true, range: [0, 90], gridcolor: '#2d3148', color: '#8892b0' },
+    angularaxis: { gridcolor: '#2d3148', color: '#8892b0' },
+  },
+  legend: { ...darkLayout.legend, orientation: 'v', x: 1.05 },
+  margin: { t: 20, r: 120, b: 20, l: 20 },
+}, {responsive: true});
+
+// ─── TOPIC COUNT CHART ───
+const topicCountData = PLATFORM_NAMES.map((name, i) => {
+  const bt = Object.values(temporalCharts).find(t => t.name === name);
+  return 0; // placeholder
+});
+
+// Get actual topic counts
+const topicCounts = [];
+const topicPlatforms = [];
+const topicColors = [];
+[["EA Forum", 69], ["LessWrong", 42], ["Open Philanthropy", 38], ["Reddit (r/AIRisk etc.)", 85], ["OpenAlex AI Safety", 31]].forEach(([name, count]) => {
+  topicPlatforms.push(name);
+  topicCounts.push(count);
+  topicColors.push(PLATFORM_COLORS[name] || '#888');
+});
+
+Plotly.newPlot('topic-count-chart', [{
+  type: 'bar',
+  x: topicPlatforms,
+  y: topicCounts,
+  marker: { color: topicColors },
+  text: topicCounts,
+  textposition: 'outside',
+}], {
+  ...darkLayout,
+  yaxis: { ...darkLayout.yaxis, title: 'Number of Topics' },
+  margin: { t: 40, r: 20, b: 80, l: 60 },
+}, {responsive: true});
+
+// ─── TEMPORAL CHARTS ───
+Object.entries(temporalCharts).forEach(([key, data]) => {
+  const el = document.getElementById('temporal-' + key);
+  if (el && data.traces && data.traces.length > 0) {
+    Plotly.newPlot(el, data.traces, {
+      ...darkLayout,
+      title: { text: data.name + ' — Risk Domain Trends', font: { size: 14 } },
+      xaxis: { ...darkLayout.xaxis, title: 'Year', dtick: 1 },
+      yaxis: { ...darkLayout.yaxis, title: 'Documents per Year' },
+      legend: { ...darkLayout.legend, orientation: 'h', y: -0.25 },
+      margin: { t: 50, r: 20, b: 120, l: 60 },
+    }, {responsive: true});
+  } else if (el) {
+    el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#8892b0;">No temporal data available</div>';
+  }
+});
+
+// ─── TAB SWITCHING ───
+function showTopics(platformId, tabEl) {
+  document.querySelectorAll('.platform-topic-section').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.topic-tab').forEach(el => el.classList.remove('active'));
+  
+  const target = document.getElementById('topics-' + platformId);
+  if (target) target.classList.add('active');
+  tabEl.classList.add('active');
+}
+
+function showTemporal(key, tabEl) {
+  document.querySelectorAll('.temporal-section').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.temporal-tab').forEach(el => el.classList.remove('active'));
+  
+  const target = document.getElementById('temporal-' + key);
+  if (target) target.classList.add('active');
+  tabEl.classList.add('active');
+  
+  // Trigger resize for Plotly
+  setTimeout(() => {
+    if (target) Plotly.Plots.resize(target);
+  }, 100);
+}
+
+// Initialize first topic tab
+document.addEventListener('DOMContentLoaded', () => {
+  const firstSection = document.querySelector('.platform-topic-section');
+  if (firstSection) firstSection.classList.add('active');
+});
+
+// Nav active state
+const navLinks = document.querySelectorAll('.nav a');
+const sections = document.querySelectorAll('.section');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(section => {
+    const sectionTop = section.offsetTop - 80;
+    if (window.scrollY >= sectionTop) current = section.getAttribute('id');
+  });
+  navLinks.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('href') === '#' + current) link.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
