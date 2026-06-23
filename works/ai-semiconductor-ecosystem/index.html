@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI 半导体产业链生态图</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="brand-lockup">
+          <div class="chip-mark" aria-hidden="true">
+            <span></span>
+          </div>
+          <div>
+            <h1>AI 半导体产业链生态图</h1>
+            <p>Chipscape Network · v0.1</p>
+          </div>
+        </div>
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M10.8 4.2a6.6 6.6 0 1 1 0 13.2 6.6 6.6 0 0 1 0-13.2Zm0 2a4.6 4.6 0 1 0 0 9.2 4.6 4.6 0 0 0 0-9.2Zm5.1 9 4 4-1.4 1.4-4-4 1.4-1.4Z" />
+          </svg>
+          <input id="searchInput" type="search" placeholder="搜索公司、环节、城市" />
+        </div>
+        <div id="viewToggle" class="view-toggle" role="group" aria-label="主视图">
+          <button class="active" type="button" data-view="package">3D拆解</button>
+          <button type="button" data-view="network">生态网络</button>
+          <button type="button" data-view="localization">国产替代</button>
+        </div>
+        <div class="mode-toggle" role="group" aria-label="地图模式">
+          <button id="scopeSegment" class="active" type="button">当前环节</button>
+          <button id="scopeAll" type="button">全产业链</button>
+        </div>
+        <div id="langToggle" class="lang-toggle" role="group" aria-label="语言">
+          <button class="active" type="button" data-lang="zh">中文</button>
+          <button type="button" data-lang="en">EN</button>
+        </div>
+      </header>
+
+      <section id="workspace" class="workspace">
+        <section class="chip-panel" aria-label="可拆解 AI 芯片机箱">
+          <div class="chip-frame">
+            <div class="chassis-glow" aria-hidden="true"></div>
+            <div class="signal-rail rail-a" aria-hidden="true"></div>
+            <div class="signal-rail rail-b" aria-hidden="true"></div>
+            <div class="signal-rail rail-c" aria-hidden="true"></div>
+            <div class="die-header">
+              <span id="activeLayer">Full Stack</span>
+              <strong id="activeSegmentName">AI 加速器/GPU/XPU</strong>
+            </div>
+            <div class="hardware-scene">
+              <div id="chipPlane" class="chip-plane" aria-label="AI 芯片与板卡元件平面图">
+                <svg id="chipLinks" class="chip-links" viewBox="0 0 680 430" aria-hidden="true"></svg>
+                <span class="chip-plane-title">AI accelerator package / board top view</span>
+                <div class="chip-package-cavity" aria-hidden="true">
+                  <span class="chip-package-label">AI ACCELERATOR PACKAGE</span>
+                  <span class="chip-pad-ring"></span>
+                </div>
+                <button class="chip-node node-substrate" type="button" data-chip-node="substrate" data-chip-component="substrate">ABF substrate</button>
+                <button class="chip-node node-interposer" type="button" data-chip-node="interposer" data-chip-component="interposer">Interposer</button>
+                <button class="chip-node node-gpu" type="button" data-chip-node="gpu" data-chip-component="gpu">GPU / XPU die</button>
+                <button class="chip-node node-hbm node-hbm-a" type="button" data-chip-node="hbm-a" data-chip-component="hbm">HBM</button>
+                <button class="chip-node node-hbm node-hbm-b" type="button" data-chip-node="hbm-b" data-chip-component="hbm">HBM</button>
+                <button class="chip-node node-hbm node-hbm-c" type="button" data-chip-node="hbm-c" data-chip-component="hbm">HBM</button>
+                <button class="chip-node node-hbm node-hbm-d" type="button" data-chip-node="hbm-d" data-chip-component="hbm">HBM</button>
+                <button class="chip-node node-bga" type="button" data-chip-node="bga" data-chip-component="bga">BGA</button>
+                <button class="chip-node node-wafer" type="button" data-chip-node="wafer" data-chip-component="wafer">Wafer</button>
+                <button class="chip-node node-euv" type="button" data-chip-node="euv" data-chip-component="euv">EUV / tools</button>
+                <button class="chip-node node-eda" type="button" data-chip-node="eda" data-chip-component="eda">EDA / IP</button>
+                <button class="chip-node node-cpu" type="button" data-chip-node="cpu" data-chip-component="cpu">CPU host</button>
+                <button class="chip-node node-nic" type="button" data-chip-node="nic" data-chip-component="nic">NIC / DPU</button>
+                <button class="chip-node node-optics" type="button" data-chip-node="optics" data-chip-component="optics">800G optics</button>
+                <button class="chip-node node-vrm" type="button" data-chip-node="vrm" data-chip-component="vrm">VRM</button>
+                <button class="chip-node node-retimer" type="button" data-chip-node="retimer" data-chip-component="retimer">Retimer</button>
+                <button class="chip-node node-cooling" type="button" data-chip-node="cooling" data-chip-component="cooling">Cold plate</button>
+              </div>
+              <div class="package-exploded" aria-hidden="true">
+                <div class="callout c1"><b>1</b><span>GPU 核心</span></div>
+                <div class="callout c2"><b>2</b><span>HBM 显存堆栈</span></div>
+                <div class="callout c3"><b>3</b><span>硅中介层</span></div>
+                <div class="callout c4"><b>4</b><span>微凸点连接</span></div>
+                <div class="callout c5"><b>5</b><span>TSV 垂直通道</span></div>
+                <div class="callout c6"><b>6</b><span>封装基板</span></div>
+                <div class="callout c7"><b>7</b><span>BGA 焊球</span></div>
+                <div class="callout c8"><b>8</b><span>高速数据通道</span></div>
+                <div class="pkg-layer top-module">
+                  <div class="fab-source source-wafer">Wafer</div>
+                  <div class="fab-source source-tool">EUV</div>
+                  <div class="fab-source source-eda">EDA</div>
+                  <div class="hbm-stack hbm-a"><i>HBM</i><span></span><span></span><span></span><span></span></div>
+                  <div class="hbm-stack hbm-b"><i>HBM</i><span></span><span></span><span></span><span></span></div>
+                  <div class="hbm-stack hbm-c"><i>HBM</i><span></span><span></span><span></span><span></span></div>
+                  <div class="hbm-stack hbm-d"><i>HBM</i><span></span><span></span><span></span><span></span></div>
+                  <div class="gpu-die">
+                    <span>NVIDIA</span>
+                    <strong>H200</strong>
+                  </div>
+                </div>
+                <div class="pkg-layer interposer-layer">
+                  <div class="circuit-lines"></div>
+                </div>
+                <div class="microbump-field">
+                  <span></span><span></span><span></span><span></span><span></span><span></span>
+                  <span></span><span></span><span></span><span></span><span></span><span></span>
+                </div>
+                <div class="pkg-layer substrate-layer">
+                  <div class="substrate-components">
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                  </div>
+                </div>
+                <div class="bga-field">
+                  <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+                  <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+                </div>
+                <div class="pkg-layer board-layer">
+                  <div class="board-traces"></div>
+                  <div class="board-component cpu-module">CPU</div>
+                  <div class="board-component nic-module">NIC / DPU</div>
+                  <div class="board-component optical-module">800G optics</div>
+                  <div class="board-component vrm-module">VRM</div>
+                  <div class="board-component retimer-module">Retimer</div>
+                  <div class="board-component cooling-module">Cold plate</div>
+                </div>
+              </div>
+              <div id="segmentGrid" class="segment-grid"></div>
+              <div id="flightModule" class="flight-module" aria-hidden="true">
+                <span>芯片设计</span>
+                <strong>AI 加速器/GPU/XPU</strong>
+              </div>
+              <div class="extraction-beam" aria-hidden="true"></div>
+              <div id="chainReality" class="chain-reality" aria-label="真实产业链对应层"></div>
+              <aside class="extraction-deck" aria-label="拆出模块">
+                <span id="extractionLabel">拆出模块</span>
+                <strong id="extractionTitle">AI 加速器/GPU/XPU</strong>
+                <p id="extractionDevices">GPU die、tensor core、MAC array、SRAM、NoC、HBM controller、PCIe/CXL、SerDes</p>
+                <div class="micro-board" aria-hidden="true">
+                  <span></span><span></span><span></span><span></span><span></span><span></span>
+                </div>
+              </aside>
+            </div>
+          </div>
+          <div id="layerTabs" class="layer-tabs" aria-label="环节层级"></div>
+        </section>
+
+        <section class="players-panel" aria-label="环节玩家">
+          <div class="section-heading">
+            <div>
+              <span id="segmentLayerLabel">芯片设计</span>
+              <h2 id="segmentTitle">AI 加速器/GPU/XPU</h2>
+            </div>
+            <span id="segmentCount" class="count-badge">5</span>
+          </div>
+          <p id="segmentDevices" class="device-line"></p>
+          <div class="drilldown-header">
+            <span>下一层器件 / 工艺</span>
+            <button id="resetPart" type="button">回到环节</button>
+          </div>
+          <div id="subLayerGrid" class="sub-layer-grid"></div>
+          <article id="partCard" class="part-card"></article>
+          <div class="drilldown-header detail-heading">
+            <span>第三层：材料 / 设备 / 工艺 / 供应商</span>
+          </div>
+          <div id="thirdLayerGrid" class="third-layer-grid"></div>
+          <div id="playerList" class="player-list"></div>
+        </section>
+
+        <section class="map-panel" aria-label="公司地图与详情">
+          <div class="map-shell">
+            <div id="mapProjectionToggle" class="map-projection-toggle" role="group" aria-label="地图投影">
+              <button class="active" type="button" data-map-projection="world">World</button>
+              <button type="button" data-map-projection="globe">Globe</button>
+            </div>
+            <div id="globeControls" class="globe-controls" role="group" aria-label="地球缩放">
+              <button type="button" data-globe-control="zoom-in">+</button>
+              <button type="button" data-globe-control="zoom-out">−</button>
+              <button type="button" data-globe-control="reset">Reset</button>
+            </div>
+            <svg id="worldMap" viewBox="0 0 1000 520" role="img" aria-label="公司总部地图">
+              <defs>
+                <filter id="pinShadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#0a1020" flood-opacity="0.28" />
+                </filter>
+              </defs>
+              <g id="mapBase"></g>
+              <g id="mapNetwork"></g>
+              <g id="mapMarkers"></g>
+            </svg>
+            <div id="mapTooltip" class="map-tooltip" hidden></div>
+          </div>
+
+          <article id="companyCard" class="company-card"></article>
+          <article class="mini-network-card">
+            <div class="mini-network-head">
+              <div>
+                <span id="miniNetworkKicker">Network Preview</span>
+                <strong id="miniNetworkTitle">生态网络快照</strong>
+              </div>
+              <button id="openNetworkView" type="button">打开网络图</button>
+            </div>
+            <svg id="miniNetwork" viewBox="0 0 460 190" role="img" aria-label="网络快照"></svg>
+          </article>
+        </section>
+      </section>
+
+      <section id="networkView" class="analysis-view network-view" hidden>
+        <div class="analysis-head">
+          <div>
+            <span>Founder / Capital Network</span>
+            <h2>创始人籍贯网络与投资网络</h2>
+          </div>
+          <div class="network-tools">
+            <div id="networkSwitch" class="network-switch" role="group" aria-label="网络类型">
+              <button class="active" type="button" data-network="origin">籍贯网络</button>
+              <button type="button" data-network="investment">投资网络</button>
+            </div>
+            <div id="networkLayoutSwitch" class="network-switch layout-switch" role="group" aria-label="网络布局">
+              <button type="button" data-network-layout="geo">地理</button>
+              <button class="active" type="button" data-network-layout="circle">Circle</button>
+              <button type="button" data-network-layout="columns">分层</button>
+            </div>
+          </div>
+        </div>
+        <div class="network-stage">
+          <svg id="networkCanvas" viewBox="0 0 1100 620" role="img" aria-label="网络图"></svg>
+          <aside id="networkInfo" class="network-info"></aside>
+        </div>
+      </section>
+
+      <section id="localizationView" class="analysis-view localization-view" hidden>
+        <div class="analysis-head">
+          <div>
+            <span>China Substitution Matrix</span>
+            <h2>国产化替代平行对比</h2>
+          </div>
+          <div id="localizationFilters" class="network-switch" role="group" aria-label="替代状态筛选">
+            <button class="active" type="button" data-status="all">全部</button>
+            <button type="button" data-status="可替代">可替代</button>
+            <button type="button" data-status="部分替代">部分替代</button>
+            <button type="button" data-status="高度依赖">高度依赖</button>
+          </div>
+        </div>
+        <div id="localizationGrid" class="localization-grid"></div>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
